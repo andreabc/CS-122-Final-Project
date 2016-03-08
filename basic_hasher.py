@@ -122,14 +122,14 @@ def hashing_algorithm(paired_end_reads, genome_ht, genome_length):
         alignments.append(alignment)
         genome_aligned_reads.append(genome_aligned_read)
         count += 1
-        #if count % 100 == 0:
-        #    time_passed = (time.clock()-start)/60
-        #    print '{} reads aligned'.format(count), 'in {:.3} minutes'.format(time_passed)
-        #    remaining_time = time_passed/count*(len(paired_end_reads)-count)
-        #    print 'Approximately {:.3} minutes remaining'.format(remaining_time)
+        if count % 100 == 0:
+            time_passed = (time.clock()-start)/60
+            print '{} reads aligned'.format(count), 'in {:.3} minutes'.format(time_passed)
+            remaining_time = time_passed/count*(len(paired_end_reads)-count)
+            print 'Approximately {:.3} minutes remaining'.format(remaining_time)
     
-    for i in range(0,len(coverage),10):
-        print i, coverage[i:i+10]
+    #for i in range(0,len(coverage),10):
+    #    print i, coverage[i:i+10]
     #print coverage 
 
     return alignments, genome_aligned_reads, coverage
@@ -185,8 +185,8 @@ def get_CNV(ref_genome, ref_coverage, donor_genome):
     #print start_positions
     #print list_cnvs
     
-    #for key in cnv_dict.keys():
-    #    print key, cnv_dict[key]
+    for key in cnv_dict.keys():
+        print key, cnv_dict[key]
 
     return cnv_dict
 

@@ -147,9 +147,11 @@ def generate_donor(ref, aligned_reads):
     donor_genome = ''.join([donor_genome[i] if donor_genome[i] != ' ' else consensus_string[i] for i
                             in range(len(donor_genome))])
     
+    
     with(open("./practice_E_1/test_donor.txt", 'a')) as myfile:
     	myfile.write(donor_genome)
 
+    #print donor_genome
     return donor_genome
 
 
@@ -331,7 +333,7 @@ if __name__ == "__main__":
     reads_fn = join(input_folder, reads_fn_end)
     ref_fn_end = 'ref_{}.txt'.format(chr_name)
     ref_fn = join(input_folder, ref_fn_end)
-    key_length = 10
+    key_length = 8
     start = time.clock()
     reads = read_reads(reads_fn)#[:300]
     
