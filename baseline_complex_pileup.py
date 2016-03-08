@@ -3,7 +3,7 @@ import numpy as np
 from collections import defaultdict
 import time
 from os.path import join
-from basic_hasher import build_hash_and_pickle, hashing_algorithm, get_CNV
+from baseline_basic_hasher import build_hash_and_pickle, hashing_algorithm, get_CNV
 from helpers.helpers import *
 import re
 
@@ -336,6 +336,7 @@ if __name__ == "__main__":
     key_length = 8
     start = time.clock()
     reads = read_reads(reads_fn)#[:300]
+    open("./{}/test_donor.txt".format(genome_name), 'w').close()
     
     genome_hash_table = build_hash_and_pickle(ref_fn, key_length)
     reference = read_reference(ref_fn)

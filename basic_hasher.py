@@ -137,16 +137,15 @@ def hashing_algorithm(paired_end_reads, genome_ht, genome_length):
 def get_CNV(ref_genome, ref_coverage, donor_genome):
     #look for areas with extra coverage in reference
     cnv_dict = defaultdict(list)
-    
 
     for i in range(len(ref_coverage)-1):
         cnv = ""
 
-        if (ref_coverage[i+1]) - ref_coverage[i] > 3:
+        if (ref_coverage[i+1]) - ref_coverage[i] > 3:           #find regions where there is a jump in coverage
             #print "position: {} - {}, {}".format(i+1,ref_coverage[i],ref_coverage[i+1])
             count = 0
             j = i+1
-            while (ref_coverage[j] - ref_coverage[j+1] <= 3):
+            while (ref_coverage[j] - ref_coverage[j+1] <= 3):   #find end of coverage increase
                 if count > 55:
                     cnv = ""
                     break
@@ -162,17 +161,24 @@ def get_CNV(ref_genome, ref_coverage, donor_genome):
     f = open(donor_genome, 'r') 
     for x in f:
         donor_string += x
-
+    a = 40
+    ref_starts = []
     for key in cnv_dict.keys():     #for every CNV
         p = re.compile(key)          
-        #if re.search(p, donor_genome):
-        it = re.finditer(key,donor_string)
-        cnv_start_indices = [m.start() for m in it]
-        #print cnv_start_indices
-        #cnv_start = re.search(p, donor_genome).start()  #get start position in donor
-        #upstream = [donor_genome[i-30:i] for i in cnv_start_indices] #get donor sequence 30bp ahead
-        
-        for i in cnv_start_indices:
+        it = re.finditer(p,donor_string)
+        cnv_start_indices = [m.start() for m in it]               #find all start positions of CNV in donor       
+        upstream = [donor_string[i-a:i] for i in cnv_start_indices]    #get donor sequence 50bp ahead        
+
+        for item in upstream:       #find upstream region in reference
+            u = re.compile(item)    
+            u_it = re.finditer(u, ref_genome)
+            ref_upstream = [m.start() for m in u_it]
+            ref_starts = [x + a for x in ref_upstream]  #add number to find CNV ref position
+            #print ref_starts
+
+        for i in ref_starts:
+            if i in cnv_dict[key]:
+                continue
             cnv_dict[key].append(i)
             #q = re.compile(upstream)
 

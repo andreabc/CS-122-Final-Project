@@ -8,6 +8,7 @@ from helpers.helpers import *
 import re
 
 READ_LENGTH = 50
+args = sys.argv[1]    
 
 
 def generate_pileup(aligned_fn):
@@ -148,7 +149,7 @@ def generate_donor(ref, aligned_reads):
                             in range(len(donor_genome))])
     
     
-    with(open("./practice_E_1/test_donor.txt", 'a')) as myfile:
+    with(open("./{}/test_donor.txt".format(args), 'a')) as myfile:
     	myfile.write(donor_genome)
 
     #print donor_genome
@@ -326,16 +327,17 @@ def consensus(ref, aligned_reads):##
 
 
 if __name__ == "__main__":
-    genome_name = 'practice_E_1'
+    genome_name = args
     input_folder = './{}'.format(genome_name)
     chr_name = '{}_chr_1'.format(genome_name)
     reads_fn_end = 'reads_{}.txt'.format(chr_name)
     reads_fn = join(input_folder, reads_fn_end)
     ref_fn_end = 'ref_{}.txt'.format(chr_name)
     ref_fn = join(input_folder, ref_fn_end)
-    key_length = 8
+    key_length = 7
     start = time.clock()
     reads = read_reads(reads_fn)#[:300]
+    open("./{}/test_donor.txt".format(genome_name), 'w').close()
     
     genome_hash_table = build_hash_and_pickle(ref_fn, key_length)
     reference = read_reference(ref_fn)
