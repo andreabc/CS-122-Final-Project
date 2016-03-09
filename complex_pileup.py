@@ -336,7 +336,7 @@ if __name__ == "__main__":
     ref_fn = join(input_folder, ref_fn_end)
     key_length = 7
     start = time.clock()
-    reads = read_reads(reads_fn)#[:300]
+    reads = read_reads(reads_fn)#[:3000]
     open("./{}/test_donor.txt".format(genome_name), 'w').close()
     
     genome_hash_table = build_hash_and_pickle(ref_fn, key_length)
@@ -358,7 +358,7 @@ if __name__ == "__main__":
     snps, insertions, deletions = generate_pileup(input_fn)
 
     donor_file = "./{}/test_donor.txt".format(genome_name)
-    cnv_dict = get_CNV(reference, coverage, donor_file)
+    cnv_dict, STR_dict = get_CNV(reference, coverage, donor_file)
 
     output_fn = join(input_folder, 'changes_{}.txt'.format(chr_name))
     with open(output_fn, 'w') as output_file:
@@ -374,6 +374,9 @@ if __name__ == "__main__":
         output_file.write('>CNV\n')
         for x in cnv_dict.keys():
         	output_file.write(x + "," + ','.join([str(u) for u in cnv_dict[x]]) + '\n' )
+        output_file.write('>STR\n')
+        for x in STR_dict.keys():
+            output_file.write(x + "," + ','.join([str(u) for u in STR_dict[x]]) + '\n' )
 
 
 
