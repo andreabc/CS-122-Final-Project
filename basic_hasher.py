@@ -128,11 +128,15 @@ def hashing_algorithm(paired_end_reads, genome_ht, genome_length):
             remaining_time = time_passed/count*(len(paired_end_reads)-count)
             print 'Approximately {:.3} minutes remaining'.format(remaining_time)
     
-    #for i in range(0,len(coverage),10):
-    #    print i, coverage[i:i+10]
+    for i in range(0,len(coverage),10):
+        print i, coverage[i:i+10]
     #print coverage 
 
     return alignments, genome_aligned_reads, coverage
+
+def is_STR(string):
+
+    return True
 
 def get_CNV(ref_genome, ref_coverage, donor_genome):
     #look for areas with extra coverage in reference
@@ -141,18 +145,18 @@ def get_CNV(ref_genome, ref_coverage, donor_genome):
     for i in range(len(ref_coverage)-1):
         cnv = ""
 
-        if (ref_coverage[i+1]) - ref_coverage[i] > 3:           #find regions where there is a jump in coverage
+        if (ref_coverage[i+1]) - ref_coverage[i] > 4:           #find regions where there is a jump in coverage
             #print "position: {} - {}, {}".format(i+1,ref_coverage[i],ref_coverage[i+1])
             count = 0
             j = i+1
-            while (ref_coverage[j] - ref_coverage[j+1] <= 3):   #find end of coverage increase
-                if count > 55:
+            while (ref_coverage[j] - ref_coverage[j+1] <= 3) or ref_coverage[j] > 50:   #find end of coverage increase
+                if count > 800:
                     cnv = ""
                     break
                 cnv += ref_genome[j]
                 count += 1
                 j += 1
-            if cnv != "":
+            if cnv != "" and len(cnv) > 20:
                 cnv_dict[cnv].append(i+1)   #append start position to CNV dict
             #list_cnvs.append(cnv) 
             #start_positions.append(i+1) 

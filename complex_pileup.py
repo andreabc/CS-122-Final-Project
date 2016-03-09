@@ -127,22 +127,22 @@ def generate_donor(ref, aligned_reads):
     donor_genome = longest_read
 
     # While there are reads that haven't been aligned, try to align them to the donor.
-    #while# padded_reads:
-    #    un_donored_reads = []
-    #    for padded_read in padded_reads:
-    #        re_aligned_read, score = align_to_donor(donor_genome, padded_read)
-    #        if score < 10:  # If the alignment isn't good, throw the read back in the set of reads to be aligned.
-    #            un_donored_reads.append(padded_read)
-    #        else:
-    #            donor_genome = ''.join([re_aligned_read[i] if donor_genome[i] == ' ' else donor_genome[i]
-    #                                    for i in range(len(donor_genome))])
+    while padded_reads:
+        un_donored_reads = []
+        for padded_read in padded_reads:
+            re_aligned_read, score = align_to_donor(donor_genome, padded_read)
+            if score < 10:  # If the alignment isn't good, throw the read back in the set of reads to be aligned.
+                un_donored_reads.append(padded_read)
+            else:
+                donor_genome = ''.join([re_aligned_read[i] if donor_genome[i] == ' ' else donor_genome[i]
+                                        for i in range(len(donor_genome))])
 #
-    #    if len(un_donored_reads) == len(padded_reads):
-    #        # If we can't find good alignments for the remaining reads, quit
-    #        break
-    #    else:
-    #        # Otherwise, restart the alignment with a smaller set of unaligned reads
-    #        padded_reads = un_donored_reads
+        if len(un_donored_reads) == len(padded_reads):
+            # If we can't find good alignments for the remaining reads, quit
+            break
+        else:
+            # Otherwise, restart the alignment with a smaller set of unaligned reads
+            padded_reads = un_donored_reads
 #
     ## Fill in any gaps with the consensus sequence and return the donor genome.
     donor_genome = ''.join([donor_genome[i] if donor_genome[i] != ' ' else consensus_string[i] for i
