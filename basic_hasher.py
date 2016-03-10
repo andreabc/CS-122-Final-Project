@@ -131,8 +131,9 @@ def hashing_algorithm(paired_end_reads, genome_ht, genome_length):
     for i in range(0,len(coverage),10):
         print i, coverage[i:i+10]
     #print coverage 
-
-    return alignments, genome_aligned_reads, coverage
+    median = sorted(coverage)[genome_length/2]
+    print "median = {}".format(median)
+    return alignments, genome_aligned_reads, coverage, median
 
 def is_STR(CNV):
     #2 bases
@@ -143,7 +144,7 @@ def is_STR(CNV):
         #print CNV[i:i+2]
         i += 2
         num_repeats += 1
-        if num_repeats > 3:
+        if num_repeats > 4:
             #STR_dict[start].append(CNV) 
             return True
 
@@ -155,7 +156,7 @@ def is_STR(CNV):
         #print CNV[i:i+3]
         i += 3
         num_repeats += 1
-        if num_repeats > 3:
+        if num_repeats > 4:
             #STR_dict[start].append(CNV)
             return True
     #4 bases
@@ -166,7 +167,7 @@ def is_STR(CNV):
         #print CNV[i:i+4]
         i += 4
         num_repeats += 1
-        if num_repeats > 3:
+        if num_repeats > 4:
             #STR_dict[start].append(CNV)
             return True
 
@@ -178,13 +179,13 @@ def is_STR(CNV):
         #print CNV[i:i+5]
         i += 5
         num_repeats += 1
-        if num_repeats > 3:
+        if num_repeats > 4:
             #STR_dict[start].append(CNV)
             return True
 
     return False
 
-def get_CNV(ref_genome, ref_coverage, donor_genome):
+def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
     #look for areas with extra coverage in reference
     
     STR_dict = defaultdict(list)
@@ -193,12 +194,12 @@ def get_CNV(ref_genome, ref_coverage, donor_genome):
     for i in range(len(ref_coverage)-1):
         cnv = ""
 
-        if (ref_coverage[i+1]) - ref_coverage[i] > 3:           #find regions where there is a jump in coverage
+        if (ref_coverage[i+1]) - ref_coverage[i] > 4 or ref_coverage[i] > 1.7*median_coverage:           #find regions where there is a jump in coverage
             #print "position: {} - {}, {}".format(i+1,ref_coverage[i],ref_coverage[i+1])
             count = 0
             j = i+1
-            while (ref_coverage[j] - ref_coverage[j+1] <= 3) or ref_coverage[j] > 50:   #find end of coverage increase
-                if count > 800:
+            while (ref_coverage[j] - ref_coverage[j+1] <= 3):   #find end of coverage increase
+                if count > 800 or j == len(ref_coverage)-2:
                     cnv = ""
                     break
                 cnv += ref_genome[j]
@@ -207,14 +208,16 @@ def get_CNV(ref_genome, ref_coverage, donor_genome):
             if cnv != "" and len(cnv) > 20:
                 cnv_dict[cnv].append(i+1)   #append start position to CNV dict
     donor_string = ""
-    f = open(donor_genome, 'r') 
-    for x in f:
-        donor_string += x
+    with open(donor_genome, 'r') as f:
+        for x in f:
+            donor_string += x
     a = 20
-    ref_starts = []
+    
     for key in cnv_dict.keys():     #for every CNV
         #determine if extra coverage region is STR
         if is_STR(key):
+            cnv_dict.pop(key)
+            #print "{} is an STR".format(key)
             p = re.compile(key)
             it = re.finditer(p, donor_string)
             str_start_indices = [m.start() for m in it]
@@ -239,34 +242,42 @@ def get_CNV(ref_genome, ref_coverage, donor_genome):
             continue
         
         #if not STR
-        p = re.compile(key)          
-        it = re.finditer(p,donor_string)
-        cnv_start_indices = [m.start() for m in it]               #find all start positions of CNV in donor       
-        upstream = [donor_string[i-a:i] for i in cnv_start_indices]    #get donor sequence 20bp ahead        
-#
-        for item in upstream:       #find upstream region in reference
-            u = re.compile(item)    
-            u_it = re.finditer(u, ref_genome)
-            ref_upstream = [m.start() for m in u_it]
-            ref_starts = [x + a for x in ref_upstream]  #add number to find CNV ref position
-            #print ref_starts
-#
-        for i in ref_starts:
-            if i in cnv_dict[key]:
-                continue
-            cnv_dict[key].append(i)
-            #q = re.compile(upstream)
+        else:
+            #print "{} is a CNV".format(key)
+            p = re.compile(key)          
+            it = re.finditer(p,donor_string)
+            cnv_start_indices = [m.start() for m in it]               #find all start positions of CNV in donor       
+            #upstream = [donor_string[i-a:i] for i in cnv_start_indices]    #get donor sequence 20bp ahead        
+            
+            #for item in upstream:       #find upstream region in reference
+            #    u = re.compile(item)    
+            #    u_it = re.finditer(u, ref_genome)
+            #    ref_upstream = [m.start() for m in u_it]
+            #    ref_starts = [x + a for x in ref_upstream]  #add number to find CNV ref position
+            #    #print ref_starts
+    ##
+            #for i in ref_starts:
+            #    if i in cnv_dict[key]:
+            #        continue
+            #    cnv_dict[key].append(i)
+                #q = re.compile(upstream)
 
-        #for i in cnv_start_indices:
-        #    if i in cnv_dict[key]:
-        #        continue
-        #    cnv_dict[key].append(i)
+            #print "cnv_start_indices = {}".format(cnv_start_indices)
+            #print cnv_dict[key]
+            if len(cnv_start_indices) <= 1: #if only found in ref
+                cnv_dict.pop(key)
+                continue
+            for i in cnv_start_indices:
+                if i in cnv_dict[key]:
+                    continue
+                #print key
+                cnv_dict[key].append(i)
 
     #print start_positions
     #print list_cnvs
     
-    for key in STR_dict.keys():
-        print key, STR_dict[key]
+    #for key in cnv_dict.keys():
+    #    print key, cnv_dict[key]
 
     return cnv_dict, STR_dict
 
