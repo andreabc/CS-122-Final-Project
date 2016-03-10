@@ -211,7 +211,7 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
                 cnv = ref_genome[j] + cnv
                 j-=1
                 start -= 1
-            print "cnv = {}".format(cnv)
+            #print "cnv = {}".format(cnv)
             if cnv != "" and len(cnv) > 15:
                 cnv_dict[cnv].append(start)
 
@@ -277,25 +277,30 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
                 ref_upstream = [m.start() for m in u_it]
                 ref_starts = [x + a for x in ref_upstream]  #add number to find CNV ref position
                 #print ref_starts
-    ##
+            first = cnv_dict[key][0]
+            cnv_dict.pop(key)
+            cnv_dict[key].append(first)
             if "ref_starts" in locals():
+                #print ref_starts
                 for i in ref_starts:
                     if i in cnv_dict[key]:
                         continue
                     cnv_dict[key].append(i)
                     #q = re.compile(upstream)
+            if len(cnv_dict[key]) == 1:
+                cnv_dict.pop(key)
 
             #print "cnv_start_indices = {}".format(cnv_start_indices)
             #print cnv_dict[key]
-            if len(cnv_start_indices) <= 1: #if only found in ref
-                cnv_dict.pop(key)
-                continue
-            cnv_dict.pop(key)
-            for i in cnv_start_indices:
-                if i in cnv_dict[key]:
-                    continue
-                #print key
-                cnv_dict[key].append(i)
+            #if len(cnv_start_indices) <= 1: #if only found in ref
+            #    cnv_dict.pop(key)
+            #    continue
+            #cnv_dict.pop(key)
+            #for i in cnv_start_indices:
+            #    if i in cnv_dict[key]:
+            #        continue
+            #    #print key
+            #    cnv_dict[key].append(i)
 
     #print start_positions
     #print list_cnvs
