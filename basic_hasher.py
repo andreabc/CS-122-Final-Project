@@ -185,6 +185,50 @@ def is_STR(CNV):
 
     return False
 
+def extend(CNV_or_STR, num_matches, donor_string, start_indices):
+    #print "IN EXTEND FUNCTION"
+    
+    if len(start_indices) == 0:
+        return CNV_or_STR
+    start_index = start_indices[0]
+
+    possible_new = CNV_or_STR
+    end_index = start_index + len(CNV_or_STR) -1
+
+    #print "CNV = {}, start_index = {}, end_index = {}".format(CNV_or_STR, start_index, end_index)
+    #extend left
+    first_try = True
+    str_start_indices = []
+    j=1
+    while (len(str_start_indices) >= num_matches or first_try) and start_index > 2:
+        possible_new = donor_string[start_index-j] + CNV_or_STR   #add on to the beginning
+        p = re.compile(possible_new)
+        it = re.finditer(p, donor_string)
+        str_start_indices = [m.start() for m in it]
+        #upstream = [donor_string[i-a:i] for i in str_start_indices]
+        first_try = False
+        j+=1
+    if j == 2:  #if exited after first try
+        possible_new = CNV_or_STR
+
+    #now extend right
+    first_try = True
+    str_start_indices = []
+
+    j=1
+    while (len(str_start_indices) >= num_matches or first_try) and end_index < len(donor_string) - 2:
+        possible_new = donor_string[end_index+j] + CNV_or_STR   #add on to the beginning
+        p = re.compile(possible_new)
+        it = re.finditer(p, donor_string)
+        str_start_indices = [m.start() for m in it]
+        first_try = False
+        j+=1
+
+    if j == 2:  #if exited after first try
+        possible_new = CNV_or_STR
+
+    return possible_new
+
 def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
     #look for areas with extra coverage in reference
     
@@ -204,14 +248,14 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
                 cnv+=ref_genome[j]
                 j+=1
             
-            #look left of position
+            #continue left of position
             j=i-1
             start = i
             while ref_coverage[j] >= median_coverage*1.4:
                 cnv = ref_genome[j] + cnv
                 j-=1
                 start -= 1
-            #print "cnv = {}".format(cnv)
+
             if cnv != "" and len(cnv) > 15:
                 cnv_dict[cnv].append(start)
 
@@ -238,11 +282,19 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
         #determine if extra coverage region is STR
         if is_STR(key):
             cnv_dict.pop(key)
-            #print "{} is an STR".format(key)
+
             p = re.compile(key)
             it = re.finditer(p, donor_string)
             str_start_indices = [m.start() for m in it]
+
+            #new_cnv = extend(key, len(str_start_indices), donor_string, str_start_indices[0])   #extend
+            #p = re.compile(new_cnv)
+            #it = re.finditer(p, donor_string)
+            #str_start_indices = [m.start() for m in it]
+
             upstream = [donor_string[i-a:i] for i in str_start_indices]
+
+            
 
             for item in upstream:       #find upstream region in reference
                 u = re.compile(item)    
@@ -257,10 +309,6 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
                         continue
                     STR_dict[key].append(i)
 
-           #for i in str_start_indices:
-           #    if i in STR_dict[key]:
-           #        continue
-           #    STR_dict[key].append(i)
             continue
         
         #if not STR
@@ -269,6 +317,13 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
             p = re.compile(key)          
             it = re.finditer(p,donor_string)
             cnv_start_indices = [m.start() for m in it]               #find all start positions of CNV in donor       
+            
+            new_cnv = extend(key, len(cnv_start_indices), donor_string, cnv_start_indices)   #extend
+            p = re.compile(new_cnv)          
+            it = re.finditer(p,donor_string)
+            cnv_start_indices = [m.start() for m in it] 
+
+
             upstream = [donor_string[i-a:i] for i in cnv_start_indices]    #get donor sequence 20bp ahead        
             
             for item in upstream:       #find upstream region in reference
