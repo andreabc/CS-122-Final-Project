@@ -130,78 +130,130 @@ def hashing_algorithm(paired_end_reads, genome_ht, genome_length):
     
     for i in range(0,len(coverage),10):
         print i, coverage[i:i+10]
-    #print coverage 
-    median = sorted(coverage)[genome_length/2]
-    print "median = {}".format(median)
-    return alignments, genome_aligned_reads, coverage, median
+   
+    return alignments, genome_aligned_reads, coverage, 
+
+#ef repeats(CNV):
+#   #2 bases
+#   i = 0
+#   start = CNV[0:2]
+#   num_repeats = 0
+#   while CNV[i:i+2] == start and i <= len(CNV)-2:
+#       #print CNV[i:i+2]
+#       i += 2
+#       num_repeats += 1
+#       if num_repeats > 4:
+#           #STR_dict[start].append(CNV) 
+#           return num_repeats, 2
+
+#   #3 bases
+#   i = 0        
+#   start = CNV[0:3]
+#   num_repeats = 0
+#   while CNV[i:i+3] == start and i < len(CNV)-1:
+#       #print CNV[i:i+3]
+#       i += 3
+#       num_repeats += 1
+#       if num_repeats > 4:
+#           #STR_dict[start].append(CNV)
+#           return num_repeats, 3
+#   #4 bases
+#   i = 0
+#   start = CNV[0:4]
+#   num_repeats = 0
+#   while CNV[i:i+4] == start and i < len(CNV)-1:
+#       #print CNV[i:i+4]
+#       i += 4
+#       num_repeats += 1
+#       if len(CNV) - num_repeats == 4:
+#           #STR_dict[start].append(CNV)
+#           return 4
+#   #5 bases
+#   i = 0
+#   num_repeats = 0
+#   start = CNV[0:5]
+#   while CNV[i:i+5] == start and i < len(CNV)-1:
+#       #print CNV[i:i+5]
+#       i += 5
+#       num_repeats += 1
+#       if len(CNV) / num_repeats == 5:
+#           #STR_dict[start].append(CNV)
+#           return 5
+#   return 0    
 
 def is_STR(CNV):
-    #2 bases
-    i = 0
-    start = CNV[0:2]
-    num_repeats = 0
-    while CNV[i:i+2] == start and i <= len(CNV)-2:
-        #print CNV[i:i+2]
-        i += 2
-        num_repeats += 1
-        if num_repeats > 4:
-            #STR_dict[start].append(CNV) 
-            return True
+    for x in range(len(CNV)):
+        #2 bases
+        i = 0
+        start = CNV[x:x+2]
+        num_repeats = 0
+        while CNV[i:i+2] == start and i <= len(CNV)-2:
+            #print CNV[i:i+2]
+            i += 2
+            num_repeats += 1
+            if num_repeats > 4:
+                #STR_dict[start].append(CNV) 
+                return True
 
-    #3 bases
-    i = 0        
-    start = CNV[0:3]
-    num_repeats = 0
-    while CNV[i:i+3] == start and i < len(CNV)-1:
-        #print CNV[i:i+3]
-        i += 3
-        num_repeats += 1
-        if num_repeats > 4:
-            #STR_dict[start].append(CNV)
-            return True
-    #4 bases
-    i = 0
-    start = CNV[0:4]
-    num_repeats = 0
-    while CNV[i:i+4] == start and i < len(CNV)-1:
-        #print CNV[i:i+4]
-        i += 4
-        num_repeats += 1
-        if num_repeats > 4:
-            #STR_dict[start].append(CNV)
-            return True
-
-    #5 bases
-    i = 0
-    num_repeats = 0
-    start = CNV[0:5]
-    while CNV[i:i+5] == start and i < len(CNV)-1:
-        #print CNV[i:i+5]
-        i += 5
-        num_repeats += 1
-        if num_repeats > 4:
-            #STR_dict[start].append(CNV)
-            return True
+        #3 bases
+        i = 0        
+        start = CNV[x:x+3]
+        num_repeats = 0
+        while CNV[i:i+3] == start and i < len(CNV)-1:
+            #print CNV[i:i+3]
+            i += 3
+            num_repeats += 1
+            if num_repeats > 4:
+                #STR_dict[start].append(CNV)
+                return True
+        #4 bases
+        i = 0
+        start = CNV[x:x+4]
+        num_repeats = 0
+        while CNV[i:i+4] == start and i < len(CNV)-1:
+            #print CNV[i:i+4]
+            i += 4
+            num_repeats += 1
+            if num_repeats > 4:
+                #STR_dict[start].append(CNV)
+                return True
+        #5 bases
+        i = 0
+        num_repeats = 0
+        start = CNV[x:x+5]
+        while CNV[i:i+5] == start and i < len(CNV)-1:
+            #print CNV[i:i+5]
+            i += 5
+            num_repeats += 1
+            if num_repeats > 4:
+                #STR_dict[start].append(CNV)
+                return True
+        
 
     return False
+#def extend_STR(STR, donor_string, start_indices):
+#    possible_new = STR
+#    for x in start_indices:
+#
+#
+#    return possible_new
 
-def extend(CNV_or_STR, num_matches, donor_string, start_indices):
-    #print "IN EXTEND FUNCTION"
-    
+def extend_CNV(CNV, num_matches, donor_string, start_indices):
     if len(start_indices) == 0:
-        return CNV_or_STR
+        return CNV
     start_index = start_indices[0]
 
-    possible_new = CNV_or_STR
-    end_index = start_index + len(CNV_or_STR) -1
+    possible_new = CNV
+    end_index = start_index + len(CNV) -1
 
     #print "CNV = {}, start_index = {}, end_index = {}".format(CNV_or_STR, start_index, end_index)
+    
     #extend left
     first_try = True
     str_start_indices = []
     j=1
     while (len(str_start_indices) >= num_matches or first_try) and start_index > 2:
-        possible_new = donor_string[start_index-j] + CNV_or_STR   #add on to the beginning
+        possible_new = donor_string[start_index-j] + CNV   #add on to the beginning
         p = re.compile(possible_new)
         it = re.finditer(p, donor_string)
         str_start_indices = [m.start() for m in it]
@@ -209,7 +261,7 @@ def extend(CNV_or_STR, num_matches, donor_string, start_indices):
         first_try = False
         j+=1
     if j == 2:  #if exited after first try
-        possible_new = CNV_or_STR
+        possible_new = CNV
 
     #now extend right
     first_try = True
@@ -217,7 +269,7 @@ def extend(CNV_or_STR, num_matches, donor_string, start_indices):
 
     j=1
     while (len(str_start_indices) >= num_matches or first_try) and end_index < len(donor_string) - 2:
-        possible_new = donor_string[end_index+j] + CNV_or_STR   #add on to the beginning
+        possible_new = donor_string[end_index+j] + CNV   #add on to the beginning
         p = re.compile(possible_new)
         it = re.finditer(p, donor_string)
         str_start_indices = [m.start() for m in it]
@@ -225,12 +277,17 @@ def extend(CNV_or_STR, num_matches, donor_string, start_indices):
         j+=1
 
     if j == 2:  #if exited after first try
-        possible_new = CNV_or_STR
-
+        possible_new = CNV
+    print "before: {} after: {}".format(CNV, possible_new)
     return possible_new
 
-def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
-    #look for areas with extra coverage in reference
+def get_CNV(ref_genome, ref_coverage, donor_genome):
+    median_coverage = sorted(ref_coverage)[len(ref_coverage)/2]
+
+    donor_string = ""
+    with open(donor_genome, 'r') as f:
+        for x in f:
+            donor_string += x
     
     STR_dict = defaultdict(list)
     cnv_dict = defaultdict(list)
@@ -238,7 +295,7 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
     for i in range(len(ref_coverage)-1):
         cnv = ""
         
-        if ref_coverage[i] >= median_coverage*1.7:  #find middle of CNV
+        if ref_coverage[i] >= median_coverage*1.9:  #find middle of CNV
             #print "i = {}".format(i)
             cnv += ref_genome[i]
             j=i+1
@@ -256,7 +313,7 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
                 j-=1
                 start -= 1
 
-            if cnv != "" and len(cnv) > 15:
+            if len(cnv) > 20:
                 cnv_dict[cnv].append(start)
 
         #if (ref_coverage[i+1]) - ref_coverage[i] > 3 or ref_coverage[i] > 1.7*median_coverage:           #find regions where there is a jump in coverage
@@ -272,11 +329,8 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
         #        j += 1
         #    if cnv != "" and len(cnv) > 20:
         #        cnv_dict[cnv].append(i+1)   #append start position to CNV dict
-    donor_string = ""
-    with open(donor_genome, 'r') as f:
-        for x in f:
-            donor_string += x
-    a = 20
+    
+    a = 25  #upstream length
     
     for key in cnv_dict.keys():     #for every CNV
         #determine if extra coverage region is STR
@@ -292,9 +346,7 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
             #it = re.finditer(p, donor_string)
             #str_start_indices = [m.start() for m in it]
 
-            upstream = [donor_string[i-a:i] for i in str_start_indices]
-
-            
+            upstream = [donor_string[i-a:i] for i in str_start_indices]        
 
             for item in upstream:       #find upstream region in reference
                 u = re.compile(item)    
@@ -305,45 +357,52 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
 
             if "ref_starts" in locals():
                 for i in ref_starts:
-                    if i in STR_dict[key]:
-                        continue
                     STR_dict[key].append(i)
+                STR_dict[key] = list(set(STR_dict[key]))
+
 
             continue
         
-        #if not STR
+        #if CNV
         else:
-            #print "{} is a CNV".format(key)
             p = re.compile(key)          
             it = re.finditer(p,donor_string)
             cnv_start_indices = [m.start() for m in it]               #find all start positions of CNV in donor       
             
-            new_cnv = extend(key, len(cnv_start_indices), donor_string, cnv_start_indices)   #extend
+            new_cnv = extend_CNV(key, len(cnv_start_indices), donor_string, cnv_start_indices)   #extend
             p = re.compile(new_cnv)          
             it = re.finditer(p,donor_string)
             cnv_start_indices = [m.start() for m in it] 
 
 
-            upstream = [donor_string[i-a:i] for i in cnv_start_indices]    #get donor sequence 20bp ahead        
+            #upstream = [donor_string[i-a:i] for i in cnv_start_indices]    #get donor sequence 20bp ahead        
+            #
+            #for item in upstream:       #find upstream region in reference
+            #    u = re.compile(item)    
+            #    u_it = re.finditer(u, ref_genome)
+            #    ref_upstream = [m.start() for m in u_it]
+            #    ref_starts = [x + a for x in ref_upstream]  #add number to find CNV ref position
+            #    #print ref_starts
+            #first = cnv_dict[key][0]
+            #cnv_dict.pop(key)
+            #cnv_dict[key].append(first)
+            #if "ref_starts" in locals():
+            #    #print ref_starts
+            #    for i in ref_starts:
+            #        if i in cnv_dict[key]:
+            #            continue
+            #        cnv_dict[key].append(i)
+            #        #q = re.compile(upstream)
+            for i in cnv_start_indices:
+                cnv_dict[key].append(i)
+            cnv_dict[key] = list(set(cnv_dict[key]))
             
-            for item in upstream:       #find upstream region in reference
-                u = re.compile(item)    
-                u_it = re.finditer(u, ref_genome)
-                ref_upstream = [m.start() for m in u_it]
-                ref_starts = [x + a for x in ref_upstream]  #add number to find CNV ref position
-                #print ref_starts
-            first = cnv_dict[key][0]
-            cnv_dict.pop(key)
-            cnv_dict[key].append(first)
-            if "ref_starts" in locals():
-                #print ref_starts
-                for i in ref_starts:
-                    if i in cnv_dict[key]:
-                        continue
-                    cnv_dict[key].append(i)
-                    #q = re.compile(upstream)
-            if len(cnv_dict[key]) == 1:
+            if len(cnv_dict[key]) <= 1: #if CNV only appears in reference
                 cnv_dict.pop(key)
+            if len(key) < 40 and len(cnv_dict[key]) < 3:
+                cnv_dict.pop(key)
+            #if len(key) < 100 and len(cnv_dict[key]) < 2:
+            #    cnv_dict.pop(key)
 
             #print "cnv_start_indices = {}".format(cnv_start_indices)
             #print cnv_dict[key]
@@ -351,11 +410,7 @@ def get_CNV(ref_genome, ref_coverage, median_coverage, donor_genome):
             #    cnv_dict.pop(key)
             #    continue
             #cnv_dict.pop(key)
-            #for i in cnv_start_indices:
-            #    if i in cnv_dict[key]:
-            #        continue
-            #    #print key
-            #    cnv_dict[key].append(i)
+            
 
     #print start_positions
     #print list_cnvs

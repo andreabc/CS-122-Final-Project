@@ -289,14 +289,10 @@ def identify_changes(ref, donor, offset):
                     new_changes.append(changes[ele])
                     count_indel += 1
 
-        if count_snp < 5:
+        if count_snp < 4:
             for ele in range(len(possible_snps)):
                 new_changes.append(possible_snps[ele])
-        #if count_snp >= 5:
-        #    #print "MORE THAN 3 SNPS IN 1 THING................................................"
-        #    new_changes.append(possible_snps[0])
-        #    new_changes.append(possible_snps[#])
-
+                
     #print new_changes
     return new_changes
 
@@ -342,7 +338,7 @@ if __name__ == "__main__":
     genome_hash_table = build_hash_and_pickle(ref_fn, key_length)
     reference = read_reference(ref_fn)
     #print "len(reference) = {}".format(len(reference))
-    genome_aligned_reads, alignments, coverage, median_coverage = hashing_algorithm(reads, genome_hash_table, len(reference))
+    genome_aligned_reads, alignments, coverage = hashing_algorithm(reads, genome_hash_table, len(reference))
     # print genome_aligned_reads
 
     
@@ -358,7 +354,7 @@ if __name__ == "__main__":
     snps, insertions, deletions = generate_pileup(input_fn)
 
     donor_file = "./{}/test_donor.txt".format(genome_name)
-    cnv_dict, STR_dict = get_CNV(reference, coverage, median_coverage, donor_file)
+    cnv_dict, STR_dict = get_CNV(reference, coverage, donor_file)
 
     output_fn = join(input_folder, 'changes_{}.txt'.format(chr_name))
     with open(output_fn, 'w') as output_file:
